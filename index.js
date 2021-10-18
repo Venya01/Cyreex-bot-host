@@ -720,7 +720,7 @@ client.on("message", async (message) => {
 
     if (command == "stop") {
         distube.stop(message);
-        message.channel.send("Megállította a zenét!");
+        message.channel.send("Megállítottad a zenét!");
     }
 
     if (command == "skip")
