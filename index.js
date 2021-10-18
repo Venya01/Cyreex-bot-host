@@ -11,13 +11,15 @@ const fs = require("fs");
 const money = require("./money.json");
 const { NOTIMP } = require("dns");
 
+const fetch = require("node-fetch")
 
 DisTube = require('distube'),
     client = new Discord.Client(),
     config = {
         prefix: "!?!",
-        token: process.env.TOKEN || "ODg1MTY5ODI3OTE0ODYyNjAy.YTjIpA.bybtI3MJG00xb-RGJaEWEWq42is"
+        token: process.env.TOKEN || "a tokenünk"
     };
+    
     
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,8 +109,6 @@ bot.on("message", async message => {
         .setAuthor(message.author.username)
         .setTitle("Help Embed!")
         .addField("Írd be hogy miben kérsz segítséget\n \n!?!help-administrator\n \n!?!help-fun\n \n!?!help-music", "***")
-        .setThumbnail(message.author.displayAvatarURL())
-        .setImage(message.guild.iconURL())
         .setDescription(`\`${prefix}\``)
         .setFooter(`${botname} | ${message.createdAt}`)
 
@@ -536,11 +536,161 @@ bot.on("message", async message => {
         }
       }
  
-  
+      if (cmd === `${prefix}ticket`)
+      message.guild.channels.create(`ticket-${message.author.username}`, {
+          permissionOverwrites: [
+              {
+                  id: message.author.id,
+                  allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              },
+              {
+                  id: message.guild.roles.everyone,
+                  deny: ['VIEW_CHANNEL'],
+              },
+          ],
+          type: 'text',
+      }).then(async channel => {
+          message.reply(`Sikeresen létrehoztad a Ticketed! Kattints a(z) ${channel}, hogy megtekintsd és megírd a problémád.`);
+          channel.send(`Üdvözlünk ${message.author} a Ticketedben! Kérlek légy türelmes, a csapat rövid időn belül válaszol. Ha be szeretnéd zárni a Ticketet akkor reagálj a megfelelő emojival`);
+          const logchannel = message.guild.channels.cache.find(channel => channel.name === 'ticket-logok');
+          if (logchannel) {
+              logchannel.send(`Ticket ${message.author.username} létrehozva. Kattints, hogy megnézd <#${channel.id}>`);
+          }
+
+          const reactionMessage = await channel.send("Köszönjük hogy felvetted velünk a kapcsolatot!");
+
+    try {
+      await reactionMessage.react("🔒");
+      await reactionMessage.react("⛔");
+    } catch (err) {
+      channel.send("Hiba: emojik küldése!");
+      throw err;
+    }
+
+    const collector = reactionMessage.createReactionCollector(
+      (reaction, user) => message.guild.members.cache.find((member) => member.id === user.id).hasPermission("ADMINISTRATOR"),
+      { dispose: true }
+    );
+
+    collector.on("collect", (reaction, user) => {
+      switch (reaction.emoji.name) {
+        case "🔒":
+          channel.updateOverwrite(message.author, { SEND_MESSAGES: false });
+          break;
+        case "⛔":
+          channel.send("A csatorna tölődni fog 5 másodperc múlva");
+          setTimeout(() => channel.delete(), 5000);
+          break;
+      }
+    });
+
+    
+      
+          
+
+      });
+
+
+
+
 })
 
 
+bot.on("message", async (message) => {
+    if(!message.guild || message.author.bot || !message.content.trim().startsWith(botconfig.prefix)) return;
+    var args = message.content.slice(botconfig.prefix.length).trim().split(" ")
+    var cmd = args.shift().toLowerCase()
 
+    const { channel } = message.member.voice;
+
+    if(cmd == "ytt" || cmd == "youtubetogether" || cmd == "youtubeegyütt"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "755600276941176913",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "betrayal" || cmd == "betrayal.io"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "773336526917861400",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "poker" || cmd == "poker-night" || cmd == "póker"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "755827207812677713",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "fishing" || cmd == "fishington.io"  || cmd == "horgászat"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "814288819477020702",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else {
+        return
+    }
+})
 
 
 
@@ -620,6 +770,104 @@ distube
 
 client.login(config.token);
 
+bot.on("message", async (message) => {
+    if(!message.guild || message.author.bot || !message.content.trim().startsWith(botconfig.prefix)) return;
+    var args = message.content.slice(botconfig.prefix.length).trim().split(" ")
+    var cmd = args.shift().toLowerCase()
+
+    const { channel } = message.member.voice;
+
+    if(cmd == "ytt" || cmd == "youtubetogether" || cmd == "youtubeegyütt"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "755600276941176913",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "betrayal" || cmd == "betrayal.io"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "773336526917861400",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "poker" || cmd == "poker-night" || cmd == "póker"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "755827207812677713",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else if(cmd == "fishing" || cmd == "fishington.io"  || cmd == "horgászat"){
+        if(!channel) return message.reply("Be kell lépj egy hangcsatornába!")
+        fetch(`https://discord.com/api/v8/channels/${channel.id}/invites`, {
+            method: "POST",
+            body: JSON.stringify({
+                max_age: 86400,
+                max_uses: 0,
+                target_application_id: "814288819477020702",
+                target_type: 2,
+                temporary: false,
+                validate: null
+            }),
+            headers: {
+                "Authorization": `Bot ${tokenfile.token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+        .then(invite =>{
+            if(!invite.code) return message.reply(":x: A játék nem tudott elindulni.")
+            message.channel.send(`Kattints a alinkre, hogy elindítsd a játékot:\n> https://discord.com/invite/${invite.code}`)
+        })
+    }else {
+        return
+    }
+})
+
+
+bot.login(tokenfile.token);
 
 bot.on("message", async message => {
     let MessageArray = message.content.split(" ");
@@ -647,4 +895,6 @@ if(cmd === `${prefix}game`){
     message.channel.send(GameStory1Embed);
 
 
+
+    
 }})
