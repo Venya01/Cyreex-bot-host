@@ -17,7 +17,7 @@ DisTube = require('distube'),
     client = new Discord.Client(),
     config = {
         prefix: "!?!",
-        token: process.env.TOKEN || "a tokenünk"
+        token: process.env.TOKEN || "ODg1MTY5ODI3OTE0ODYyNjAy.YTjIpA.ky_3reRiMlksvl5cVcYoT6eLbW8"
     };
     
     
@@ -66,9 +66,12 @@ bot.on("ready", async() => {
 
     let státuszok = [
         "Prefix: !?!",
-        "Készítő: Venya",
+        "Készítő: Venya ",
+        `${bot.guilds.cache.size} Szerver `
     ]
 
+
+    
     setInterval(function() {
         let status = státuszok[Math.floor(Math.random()* státuszok.length)]
 
@@ -334,7 +337,7 @@ bot.on("message", async message => {
     
       }
 
-    if(cmd === `${prefix}kutya`) {
+    if(cmd === `${prefix}dog`) {
         let msg = await message.channel.send('Generálás... ')
  
    var dog;
@@ -402,7 +405,7 @@ bot.on("message", async message => {
         let válaszNum = Math.floor(Math.random() * válaszArray.length) + 1;
         if(MessageArray[1] === `fej` || MessageArray[1] === `írás` || MessageArray[1] === `írás`|| MessageArray[1] === `fej`) {
     
-        message.reply(`Te: ${MessageArray[1]} Cyreex BOT: ${válaszArray[válaszNum]}`);
+        message.reply(`Te: ${MessageArray[1]} Nyertes: ${válaszArray[válaszNum]}`);
         } else message.reply("Kérlek adj meg egy tárgyat! pl fej, írás")
     }
 
@@ -420,37 +423,9 @@ bot.on("message", async message => {
         } else message.reply("Ehhez nincs jogod! (KICK_MEMBERS jogot igényel!)")
     }
     
-    if(cmd === `${prefix}report`){
-        if(args[0] && message.mentions.members.first() && args[1]){
-    
-            message.channel.send("A reportodat sikeresen elküldtük!")
-    
-            let report_channel = "887361238257008651";
-    
-            let report_embed = new Discord.MessageEmbed()
-                .setAuthor(message.mentions.members.first().user.tag + `| REPORTED`)
-                .setDescription("Report indoka:" + args.join(" ").slice(args[0].length))
-                .addField("Reportolta:", message.author.tag)
-                .setColor("RANDOM")
-                .setTimestamp(message.createdAt)
-                .setFooter(bot.user.username)
-    
-                bot.channels.cache.get(report_channel).send(report_embed);
-    
-        } else {
-            let he_embed = new Discord.MessageEmbed()
-                .setAuthor(message.author.tag + `| Használat`)
-                .setDescription(`${prefix}report @<név> <indok>`)
-                .setColor("RANDOM")
-                .setTimestamp(message.createdAt)
-                .setFooter(bot.user.username)
-    
-                message.channel.send(he_embed);
-        }
-    }
     
     
-    if(cmd === `${prefix}szavazas`){
+    if(cmd === `${prefix}szavazás`){
         if(message.guild.member(bot.user).hasPermission("ADMINISTRATOR"))
         if(args[0]){
             let he_embed = new Discord.MessageEmbed()
@@ -509,87 +484,6 @@ bot.on("message", async message => {
         message.delete().catch();
         message.channel.send(bMessage);
     }
-
-    if(cmd === `${prefix}mute`){
-        message.delete()
-        if(!message.member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']))
-        message.channel.send("Nincs jogod használni ezt a parancsot!");
-      else {
-        const user = message.mentions.users.first();
-        const member = message.guild.member(user);
-      
-        if(member) {
-            if(member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']) && !message.member.hasPermission('ADMINISTRATOR'))
-                message.channel.send("Nem tudod lenémítani az illetőt!");
-            else {
-                let mutedRole = message.guild.roles.cache.get(`760166323648200735`);
-                if(mutedRole) {
-                    member.roles.add(mutedRole);
-                    message.channel.send("A felhasználót lenémítottuk!");
-                }
-                else
-                    message.channel.send("A mute rang nem található.");
-            }
-        }
-        else
-            message.channel.send("Az illető nem található!");
-        }
-      }
- 
-      if (cmd === `${prefix}ticket`)
-      message.guild.channels.create(`ticket-${message.author.username}`, {
-          permissionOverwrites: [
-              {
-                  id: message.author.id,
-                  allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-              },
-              {
-                  id: message.guild.roles.everyone,
-                  deny: ['VIEW_CHANNEL'],
-              },
-          ],
-          type: 'text',
-      }).then(async channel => {
-          message.reply(`Sikeresen létrehoztad a Ticketed! Kattints a(z) ${channel}, hogy megtekintsd és megírd a problémád.`);
-          channel.send(`Üdvözlünk ${message.author} a Ticketedben! Kérlek légy türelmes, a csapat rövid időn belül válaszol. Ha be szeretnéd zárni a Ticketet akkor reagálj a megfelelő emojival`);
-          const logchannel = message.guild.channels.cache.find(channel => channel.name === 'ticket-logok');
-          if (logchannel) {
-              logchannel.send(`Ticket ${message.author.username} létrehozva. Kattints, hogy megnézd <#${channel.id}>`);
-          }
-
-          const reactionMessage = await channel.send("Köszönjük hogy felvetted velünk a kapcsolatot!");
-
-    try {
-      await reactionMessage.react("🔒");
-      await reactionMessage.react("⛔");
-    } catch (err) {
-      channel.send("Hiba: emojik küldése!");
-      throw err;
-    }
-
-    const collector = reactionMessage.createReactionCollector(
-      (reaction, user) => message.guild.members.cache.find((member) => member.id === user.id).hasPermission("ADMINISTRATOR"),
-      { dispose: true }
-    );
-
-    collector.on("collect", (reaction, user) => {
-      switch (reaction.emoji.name) {
-        case "🔒":
-          channel.updateOverwrite(message.author, { SEND_MESSAGES: false });
-          break;
-        case "⛔":
-          channel.send("A csatorna tölődni fog 5 másodperc múlva");
-          setTimeout(() => channel.delete(), 5000);
-          break;
-      }
-    });
-
-    
-      
-          
-
-      });
-
 
 
 
@@ -714,13 +608,13 @@ client.on("message", async (message) => {
 
     if (["repeat", "loop"].includes(command)){
         distube.setRepeatMode(message, parseInt(args[0]));
-        message.channel.send("Meg többszörözte a zene lejátzását!");
+        message.channel.send("Meg többszörözted a zene lejátzását!");
 
     }
 
     if (command == "stop") {
         distube.stop(message);
-        message.channel.send("Megállítottad a zenét!");
+        message.channel.send("Megállította a zenét!");
     }
 
     if (command == "skip")
@@ -896,5 +790,6 @@ if(cmd === `${prefix}game`){
 
 
 
+    
     
 }})
